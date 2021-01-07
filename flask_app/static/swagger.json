@@ -1,0 +1,11 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API créée dans le cadre du projet transverse MS VALDOM 20/21",
+    "version": "1.0.0",
+    "title": "API Projet Transverse",
+    "contact": {
+      "email": "mettre_une_addresse_email_ici@somedomain.com"
+    }
+  }
+}
