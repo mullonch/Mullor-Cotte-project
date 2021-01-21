@@ -1,11 +1,125 @@
 {
-  "openapi": "3.0.0",
+  "swagger": "2.0",
   "info": {
     "description": "API créée dans le cadre du projet transverse MS VALDOM 20/21",
     "version": "1.0.0",
     "title": "API Projet Transverse",
     "contact": {
       "email": "mettre_une_addresse_email_ici@somedomain.com"
+    }
+  },
+  "host": "localhost",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "predict",
+      "description": "Prédictions du modèle"
+    },
+    {
+      "name": "hello",
+      "description": "Pour dire bonjour"
+    },
+    {
+      "name": "tests",
+      "description": "Quelques tests"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/predict": {
+      "post": {
+        "tags": [
+          "predict"
+        ],
+        "summary": "Demande une prédiction au modèle",
+        "description": "",
+        "operationId": "predict",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Informations about the article",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Predict"
+            }
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "hello"
+        ],
+        "summary": "Says hello",
+        "description": "",
+        "operationId": "hello",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Hello frero"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Predict": {
+      "type": "object",
+      "required": [
+        "title",
+        "date",
+        "text",
+        "subject"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Donald Trump Sends Out Embarrassing New Year’s Eve Message; This is Disturbing"
+        },
+        "date": {
+          "type": "string",
+          "example": "December 31, 2017"
+        },
+        "text": {
+          "type": "string",
+          "example": "The text of an article (could be very long)"
+        },
+        "subect": {
+          "type": "string",
+          "enum": [
+            "News",
+            "politics",
+            "Government News",
+            "left-news",
+            "US_News",
+            "Middle-east"
+          ]
+        }
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "prediction": {
+          "type": "boolean"
+        }
+      }
     }
   }
 }
