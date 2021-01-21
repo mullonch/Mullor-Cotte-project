@@ -1,3 +1,4 @@
+
 import pickle
 import re
 import string
@@ -6,14 +7,46 @@ import flask
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
-from flask import Flask, request, jsonify
+
+from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
+
+from flask_swagger_ui import get_swaggerui_blueprint
+
+
 # import pickle
 from keras.models import load_model
 from keras.preprocessing import sequence
 from nltk.corpus import stopwords
 import nltk
+import pandas as pd
+from keras.preprocessing import text, sequence
+from keras.preprocessing.text import Tokenizer
+import numpy as np
+
 
 server = Flask(__name__)
+
+# Load the model file
+model = load_model('Model/model.h5')
+
+
+@server.route('/static/<path:path>', methods=['GET'])
+def send_static(path):
+    return send_from_directory('static', path)
+
+
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+swaggerui_blueprint= get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name':'Projet Transverse'
+    }
+)
+server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+server.register_blueprint(Blueprint('request_api', __name__))
+
 
 # Load the model file
 model = load_model('Model/model.h5')
