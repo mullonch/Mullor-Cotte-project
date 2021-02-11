@@ -50,10 +50,12 @@ model = load_model('Model/model.h5')
 
 @server.route('/predict', methods=['POST'])
 def predict():
+
     title = request.json['title']
     date = request.json['date']
     text = request.json['text']
     subject = request.json['subject']
+    #return "OK !"
     # Create dataframe
     df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
 
@@ -81,24 +83,22 @@ def say_hello():
 
 
 # predict with train data prepared retrieved in the notebook
-@server.route('/predict_with_data')
-def predict_with_data():
-    print("ok")
-    data_train = pd.read_csv('Model/train_data.csv')
-    for i in range(10):
-        sample = data_train.values.tolist()[i][1:]  # remove index added by pandas
-        sample_np = np.array(sample)
-
-        prediction = model.predict_classes(sample_np.reshape(-1, 300))[0][0]
-
-    return jsonify(prediction)
+#@server.route('/predict_with_data')
+#def predict_with_data():
+#    print("ok")
+#    data_train = pd.read_csv('Model/train_data.csv')
+#    for i in range(10):
+#        sample = data_train.values.tolist()[i][1:]  # remove index added by pandas
+#        sample_np = np.array(sample)
+#         prediction = model.predict_classes(sample_np.reshape(-1, 300))[0][0]
+#
+#    return jsonify(prediction)
 
 
 def message(prediction):
-    if prediction == 1:
+    if prediction:
         return "This is a real news article"
-    else:
-        return "This is a fake"
+    return "This is a fake"
 
 
 def tokenize(text):
