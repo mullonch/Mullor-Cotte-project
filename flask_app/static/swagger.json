@@ -8,8 +8,8 @@
       "email": "mettre_une_addresse_email_ici@somedomain.com"
     }
   },
-  "host": "localhost",
-  "basePath": "/api",
+  "host": "localhost:8000",
+  "basePath": "/",
   "tags": [
     {
       "name": "predict",
@@ -25,7 +25,6 @@
     }
   ],
   "schemes": [
-    "https",
     "http"
   ],
   "paths": {
@@ -59,7 +58,9 @@
             "description": "Invalid input"
           }
         }
-      },
+      }
+    },
+    "/hello": {
       "get": {
         "tags": [
           "hello"

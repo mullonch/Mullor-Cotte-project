@@ -10,6 +10,7 @@ import pandas as pd
 from keras.preprocessing import text, sequence
 from keras.preprocessing.text import Tokenizer
 import numpy as np
+import os
 
 server = Flask(__name__)
 # Load the model file
@@ -22,22 +23,17 @@ server = Flask(__name__)
 model = load_model('Model/model.h5')
 
 
-@server.route('/static/<path:path>', methods=['GET'])
-def send_static(path):
-    return send_from_directory('static', path)
-
-
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
-swaggerui_blueprint= get_swaggerui_blueprint(
+swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name':'Projet Transverse'
+        'app_name': 'Projet Transverse'
     }
 )
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-server.register_blueprint(Blueprint('request_api', __name__))
+
 
 @server.route('/predict', methods=['POST'])
 def predict():
