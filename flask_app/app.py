@@ -1,25 +1,33 @@
+
+import pickle
+import re
+import string
+
+import flask
+import numpy as np
+import pandas as pd
+from bs4 import BeautifulSoup
+
 from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
 
 from flask_swagger_ui import get_swaggerui_blueprint
 
+
 # import pickle
-import tensorflow as tf
-import keras
 from keras.models import load_model
+from keras.preprocessing import sequence
+from nltk.corpus import stopwords
+import nltk
 import pandas as pd
 from keras.preprocessing import text, sequence
 from keras.preprocessing.text import Tokenizer
 import numpy as np
 import os
 
+
 server = Flask(__name__)
+
 # Load the model file
-# model = pickle.load(open('Model/model.h5', 'rb'))
-
-
-# load the model, and pass in the custom metric function
-# global graph
-# graph = tf.get_default_graph()
 model = load_model('Model/model.h5')
 
 
@@ -35,34 +43,107 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 
+
+# Load the model file
+model = load_model('Model/model.h5')
+
+
 @server.route('/predict', methods=['POST'])
 def predict():
     title = request.json['title']
     date = request.json['date']
     text = request.json['text']
     subject = request.json['subject']
-
+    # Create dataframe
     df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
 
-    dataset = formate_dataset(df)
+    data = formate_dataset(df)
 
-    # data = str(model.predict(dataset))
+    # Apply function for NLP processing
+    data['text'] = data['text'].apply(denoise_text)
 
-    # X = tokenizer(dataset)
+    # Tokenize sample
+    tokenized_text = tokenize(data['text'].values)
 
-    return jsonify("X")
-    # return X.to_html(header="true", table_id="table")
+    # transform sample in numpy array and reshape in (1,300)
+    sample_np = np.array(tokenized_text).reshape(-1, 300)
 
-    #
-    # arr = np.array([title, date, text, subject])
-    # return arr
+    # load model and predict
+    model = load_model('Model/model.h5')
+    prediction = model.predict_classes(sample_np)[0][0]
+
+    return jsonify(message(int(prediction)))
 
 
-def tokenizer(data_text):
-    tokenizer = text.Tokenizer(num_words=10000)
-    tokenized_test = tokenizer.texts_to_sequences(data_text)
-    X_test = sequence.pad_sequences(tokenized_test, maxlen=300)
-    return (X_test)
+@server.route('/hello')
+def say_hello():
+    return 'Welcome to the real article classifier !'
+
+
+# predict with train data prepared retrieved in the notebook
+@server.route('/predict_with_data')
+def predict_with_data():
+    print("ok")
+    data_train = pd.read_csv('Model/train_data.csv')
+    for i in range(10):
+        sample = data_train.values.tolist()[i][1:]  # remove index added by pandas
+        sample_np = np.array(sample)
+
+        prediction = model.predict_classes(sample_np.reshape(-1, 300))[0][0]
+
+    return jsonify(prediction)
+
+
+def message(prediction):
+    if prediction == 1:
+        return "This is a real news article"
+    else:
+        return "This is a fake"
+
+
+def tokenize(text):
+    # loading
+    with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
+        tokenizer = pickle.load(handle)
+
+    tokenized_text = tokenizer.texts_to_sequences(text)
+    return sequence.pad_sequences(tokenized_text, maxlen=300)
+
+
+def strip_html(text):
+    soup = BeautifulSoup(text, "html.parser")
+    return soup.get_text()
+
+
+# Removing the square brackets
+def remove_between_square_brackets(text):
+    return re.sub('\[[^]]*\]', '', text)
+
+
+# Removing URL's
+def remove_between_square_brackets(text):
+    return re.sub(r'http\S+', '', text)
+
+
+# Removing the stopwords from text
+def remove_stopwords(text):
+    nltk.download("stopwords")
+    stop = set(stopwords.words('english'))
+    punctuation = list(string.punctuation)
+    stop.update(punctuation)
+    final_text = []
+    for i in text.split():
+        if i.strip().lower() not in stop:
+            final_text.append(i.strip())
+    return " ".join(final_text)
+
+
+# Removing the noisy text
+def denoise_text(text):
+    text = strip_html(text)
+    text = remove_between_square_brackets(text)
+    text = remove_stopwords(text)
+    return text
 
 
 def formate_dataset(df):
@@ -78,33 +159,3 @@ def run_request():
     index = int(request.json['index'])
     list_color = ['red', 'green', 'blue', 'yellow', 'black']
     return list_color[index]
-
-
-@server.route('/', methods=['GET', 'POST'])
-def get_color():
-    if request.method == 'GET':
-        return 'The model is up and running. Send a POST request'
-    else:
-        return run_request()
-
-
-@server.route('/hello')
-def say_hello():
-    return 'hello frero'
-
-
-@server.route('/get', methods=['GET'])
-def get():
-    return 'test get'
-
-
-@server.route('/post', methods=['POST'])
-def post():
-    return run_request()
-
-    # return jsonify(request.json)
-#     index = request.json['index']
-#    list = ['red', 'green', 'blue', 'yellow', 'black']
-
-#    return index
-#    return list[index]
