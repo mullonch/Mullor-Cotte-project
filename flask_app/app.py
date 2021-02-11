@@ -22,6 +22,7 @@ import pandas as pd
 from keras.preprocessing import text, sequence
 from keras.preprocessing.text import Tokenizer
 import numpy as np
+import os
 
 
 server = Flask(__name__)
@@ -30,22 +31,17 @@ server = Flask(__name__)
 model = load_model('Model/model.h5')
 
 
-@server.route('/static/<path:path>', methods=['GET'])
-def send_static(path):
-    return send_from_directory('static', path)
-
-
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
-swaggerui_blueprint= get_swaggerui_blueprint(
+swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name':'Projet Transverse'
+        'app_name': 'Projet Transverse'
     }
 )
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-server.register_blueprint(Blueprint('request_api', __name__))
+
 
 
 # Load the model file
@@ -54,10 +50,12 @@ model = load_model('Model/model.h5')
 
 @server.route('/predict', methods=['POST'])
 def predict():
+
     title = request.json['title']
     date = request.json['date']
     text = request.json['text']
     subject = request.json['subject']
+    #return "OK !"
     # Create dataframe
     df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
 
@@ -85,24 +83,22 @@ def say_hello():
 
 
 # predict with train data prepared retrieved in the notebook
-@server.route('/predict_with_data')
-def predict_with_data():
-    print("ok")
-    data_train = pd.read_csv('Model/train_data.csv')
-    for i in range(10):
-        sample = data_train.values.tolist()[i][1:]  # remove index added by pandas
-        sample_np = np.array(sample)
-
-        prediction = model.predict_classes(sample_np.reshape(-1, 300))[0][0]
-
-    return jsonify(prediction)
+#@server.route('/predict_with_data')
+#def predict_with_data():
+#    print("ok")
+#    data_train = pd.read_csv('Model/train_data.csv')
+#    for i in range(10):
+#        sample = data_train.values.tolist()[i][1:]  # remove index added by pandas
+#        sample_np = np.array(sample)
+#         prediction = model.predict_classes(sample_np.reshape(-1, 300))[0][0]
+#
+#    return jsonify(prediction)
 
 
 def message(prediction):
-    if prediction == 1:
+    if prediction:
         return "This is a real news article"
-    else:
-        return "This is a fake"
+    return "This is a fake"
 
 
 def tokenize(text):
