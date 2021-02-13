@@ -1,26 +1,14 @@
-
 import pickle
 import re
 import string
-
-import flask
-import numpy as np
-import pandas as pd
 from bs4 import BeautifulSoup
-
 from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
-
 from flask_swagger_ui import get_swaggerui_blueprint
-
-
-# import pickle
 from keras.models import load_model
-from keras.preprocessing import sequence
 from nltk.corpus import stopwords
 import nltk
 import pandas as pd
 from keras.preprocessing import text, sequence
-from keras.preprocessing.text import Tokenizer
 import numpy as np
 
 
@@ -73,7 +61,7 @@ def predict():
     sample_np = np.array(tokenized_text).reshape(-1, 300)
 
     # load model and predict
-    model = load_model('Model/model.h5')
+    # model = load_model('Model/model.h5')
     prediction = model.predict_classes(sample_np)[0][0]
 
     return jsonify(message(int(prediction)))
@@ -119,13 +107,13 @@ def strip_html(text):
     return soup.get_text()
 
 
-# Removing the square brackets
+# Removing all between the square brackets
 def remove_between_square_brackets(text):
     return re.sub('\[[^]]*\]', '', text)
 
 
 # Removing URL's
-def remove_between_square_brackets(text):
+def remove_url(text):
     return re.sub(r'http\S+', '', text)
 
 
@@ -146,6 +134,7 @@ def remove_stopwords(text):
 def denoise_text(text):
     text = strip_html(text)
     text = remove_between_square_brackets(text)
+    text = remove_url(text)
     text = remove_stopwords(text)
     return text
 
@@ -155,7 +144,6 @@ def formate_dataset(df):
     del df['title']
     del df['subject']
     del df['date']
-
     return df
 
 
