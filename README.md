@@ -1,4 +1,4 @@
-![Build Status](https://github.com/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project/workflows/Create python-app.yml/badge.svg)
+![Build Status](https://github.com/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project/workflows/python-app.yml/badge.svg)
 
 <img src="https://can7.fr/images/inp-enseeiht.jpg" width=300, style="max-width: 110px; display: inline" alt="N7"/>
 
