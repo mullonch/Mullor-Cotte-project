@@ -5,7 +5,9 @@
 The aim of this project is to run in production a deep learning model supposed to detect fake news. The model can be 
 deployed in a simple API thanks to the Flask web-framework. 
 
+<div align="center">
 <img src="https://gosint.files.wordpress.com/2018/07/fake-news-vs-truth.jpg?w=768&h=445" width=500, style="display: block; margin-left: auto; margin-right: auto; text-align:center;" alt="notebook_img"/>
+</div>
 
 ### Why fake news is a problem ?
 
