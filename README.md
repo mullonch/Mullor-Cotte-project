@@ -1,6 +1,4 @@
 ![pytesting](https://github.com/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project/workflows/pytesting/badge.svg)
-[![Build Status - Travis](https://travis-ci.org/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/pytesting.svg?branch=master)](https://travis-ci.org/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/pytesting)
-[![Build Status - GitHub](https://github.com/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project/workflows/pytesting/badge.svg)](https://github.com/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project/actions?query=workflow%3Apytesting)
 [![Coverage Status](https://coveralls.io/repos/github/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project/workflows/pytesting/badge.svg?branch=master)](https://coveralls.io/github/VALDOM-PROJET-TRANSVERSE-2020/Mullor-Cotte-project/Mullor-Cotte-project?branch=master)
 
 <img src="https://can7.fr/images/inp-enseeiht.jpg" width=300, style="max-width: 110px; display: inline" alt="N7"/>
