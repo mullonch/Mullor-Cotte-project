@@ -12,9 +12,7 @@ from keras.preprocessing import text, sequence
 import numpy as np
 import os
 
-
 server = Flask(__name__)
-
 
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
@@ -27,10 +25,15 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 )
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
+# absolute path to this file
+FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+# load model
+# model = load_model('Model/model.h5')
+model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
+
 
 @server.route('/predict', methods=['POST'])
 def predict():
-
     assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
     assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
 
@@ -53,10 +56,6 @@ def predict():
     # transform sample in numpy array and reshape in (1,300)
     sample_np = np.array(tokenized_text).reshape(-1, 300)
 
-    # load model and predict
-    model = load_model('Model/model.h5')
-
-    # model = load_model(os.path.join(server.instance_path, '..\\Model', 'model.h5')) --> absolute flask path
     prediction = model.predict_classes(sample_np)[0][0]
 
     return jsonify(message(int(prediction)))
@@ -68,8 +67,8 @@ def say_hello():
 
 
 # predict with train data prepared retrieved in the notebook
-#@server.route('/predict_with_data')
-#def predict_with_data():
+# @server.route('/predict_with_data')
+# def predict_with_data():
 #    print("ok")
 #    data_train = pd.read_csv('Model/train_data.csv')
 #    for i in range(10):
@@ -88,12 +87,10 @@ def message(prediction):
         return "This is a fake"
 
 
-
-
 def tokenize(text):
     # loading tokenizer file
-    with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
-    # with open(os.path.join(server.instance_path, '..\\Tokenizer', 'tokenizer.pickle'), 'rb') as handle: --> absolute flask path
+    # with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
+    with open(os.path.join(FILE_DIR, 'Tokenizer', 'tokenizer.pickle'), 'rb') as handle:
         tokenizer = pickle.load(handle)
 
     tokenized_text = tokenizer.texts_to_sequences(text)
