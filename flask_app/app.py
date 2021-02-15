@@ -15,9 +15,6 @@ import os
 
 server = Flask(__name__)
 
-# Load the model file
-model = load_model('Model/model.h5')
-
 
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
@@ -31,19 +28,17 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 
-
-# Load the model file
-model = load_model('Model/model.h5')
-
-
 @server.route('/predict', methods=['POST'])
 def predict():
+
+    assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
+    assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
 
     title = request.json['title']
     date = request.json['date']
     text = request.json['text']
     subject = request.json['subject']
-    #return "OK !"
+
     # Create dataframe
     df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
 
@@ -59,7 +54,9 @@ def predict():
     sample_np = np.array(tokenized_text).reshape(-1, 300)
 
     # load model and predict
-    # model = load_model('Model/model.h5')
+    model = load_model('Model/model.h5')
+
+    # model = load_model(os.path.join(server.instance_path, '..\\Model', 'model.h5')) --> absolute flask path
     prediction = model.predict_classes(sample_np)[0][0]
 
     return jsonify(message(int(prediction)))
@@ -84,14 +81,19 @@ def say_hello():
 
 
 def message(prediction):
-    if prediction:
+    assert (prediction == 0 or prediction == 1), "The model encountered an issue"
+    if prediction == 1:
         return "This is a real news article"
-    return "This is a fake"
+    elif prediction == 0:
+        return "This is a fake"
+
+
 
 
 def tokenize(text):
-    # loading
+    # loading tokenizer file
     with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
+    # with open(os.path.join(server.instance_path, '..\\Tokenizer', 'tokenizer.pickle'), 'rb') as handle: --> absolute flask path
         tokenizer = pickle.load(handle)
 
     tokenized_text = tokenizer.texts_to_sequences(text)
@@ -141,9 +143,3 @@ def formate_dataset(df):
     del df['subject']
     del df['date']
     return df
-
-
-def run_request():
-    index = int(request.json['index'])
-    list_color = ['red', 'green', 'blue', 'yellow', 'black']
-    return list_color[index]
