@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.8.1"
+install:
+  - pip install pytest
+  - pip install pytest-cov
+  - pip install coveralls
+  - pip install -r flask_app/requirements.txt
+script:
+  - pytest --cov=tests/
+after_success:
+  - coveralls

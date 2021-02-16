@@ -49,6 +49,5 @@ urllib3==1.25.11
 Werkzeug==1.0.1
 wrapt==1.12.1
 gunicorn
-gunicorn
 flask-swagger-ui==3.36.0
 routes==2.5.1

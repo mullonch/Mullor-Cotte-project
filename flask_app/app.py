@@ -1,35 +1,18 @@
-
 import pickle
 import re
 import string
-
-import flask
-import numpy as np
-import pandas as pd
 from bs4 import BeautifulSoup
-
-from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
-
+from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint, render_template
 from flask_swagger_ui import get_swaggerui_blueprint
-
-
-# import pickle
 from keras.models import load_model
-from keras.preprocessing import sequence
 from nltk.corpus import stopwords
 import nltk
 import pandas as pd
 from keras.preprocessing import text, sequence
-from keras.preprocessing.text import Tokenizer
 import numpy as np
 import os
 
-
 server = Flask(__name__)
-
-# Load the model file
-model = load_model('Model/model.h5')
-
 
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
@@ -42,20 +25,23 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 )
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
-
-
-# Load the model file
-model = load_model('Model/model.h5')
+# absolute path to this file
+FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+# load model
+# model = load_model('Model/model.h5')
+model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 
 @server.route('/predict', methods=['POST'])
 def predict():
+    assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
+    assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
 
     title = request.json['title']
     date = request.json['date']
     text = request.json['text']
     subject = request.json['subject']
-    #return "OK !"
+
     # Create dataframe
     df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
 
@@ -70,8 +56,6 @@ def predict():
     # transform sample in numpy array and reshape in (1,300)
     sample_np = np.array(tokenized_text).reshape(-1, 300)
 
-    # load model and predict
-    model = load_model('Model/model.h5')
     prediction = model.predict_classes(sample_np)[0][0]
 
     return jsonify(message(int(prediction)))
@@ -79,12 +63,33 @@ def predict():
 
 @server.route('/hello')
 def say_hello():
-    return 'Welcome to the real article classifier !'
+    # if request.headers['Content-Type'] == 'application/json; charset=UTF-8':
+    #     return 'Welcome to the real article classifier !'
+    # else:
+    #     return "NOT API"
+    html = False
+    if not request.json or not 'html' in request.json:
+        html=False
+        return 'Welcome to the real article classifier !'
+    elif request.json['html'] == "True":
+        html = True
+        return render_template('welcome.html')
+
+    # return 'Welcome to the real article classifier !' + str(html)
+
+    # if request.args['type'] == 'json':
+    #     return 'Welcome to the real article classifier !'
+    # else:
+    #     return "<html>\
+    #           <body>\
+    #             <strong>Welcome to the real article classifier !</strong>\
+    #           </body>\
+    #         </html>"
 
 
 # predict with train data prepared retrieved in the notebook
-#@server.route('/predict_with_data')
-#def predict_with_data():
+# @server.route('/predict_with_data')
+# def predict_with_data():
 #    print("ok")
 #    data_train = pd.read_csv('Model/train_data.csv')
 #    for i in range(10):
@@ -96,14 +101,17 @@ def say_hello():
 
 
 def message(prediction):
-    if prediction:
+    assert (prediction == 0 or prediction == 1), "The model encountered an issue"
+    if prediction == 1:
         return "This is a real news article"
-    return "This is a fake"
+    elif prediction == 0:
+        return "This is a fake"
 
 
 def tokenize(text):
-    # loading
-    with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
+    # loading tokenizer file
+    # with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
+    with open(os.path.join(FILE_DIR, 'Tokenizer', 'tokenizer.pickle'), 'rb') as handle:
         tokenizer = pickle.load(handle)
 
     tokenized_text = tokenizer.texts_to_sequences(text)
@@ -115,13 +123,13 @@ def strip_html(text):
     return soup.get_text()
 
 
-# Removing the square brackets
+# Removing all between the square brackets
 def remove_between_square_brackets(text):
     return re.sub('\[[^]]*\]', '', text)
 
 
 # Removing URL's
-def remove_between_square_brackets(text):
+def remove_url(text):
     return re.sub(r'http\S+', '', text)
 
 
@@ -142,6 +150,7 @@ def remove_stopwords(text):
 def denoise_text(text):
     text = strip_html(text)
     text = remove_between_square_brackets(text)
+    text = remove_url(text)
     text = remove_stopwords(text)
     return text
 
@@ -151,11 +160,4 @@ def formate_dataset(df):
     del df['title']
     del df['subject']
     del df['date']
-
     return df
-
-
-def run_request():
-    index = int(request.json['index'])
-    list_color = ['red', 'green', 'blue', 'yellow', 'black']
-    return list_color[index]
