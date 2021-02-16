@@ -72,11 +72,7 @@ def predict():
 
 @server.route('/hello')
 def say_hello():
-    # if request.headers['Content-Type'] == 'application/json; charset=UTF-8':
-    #     return 'Welcome to the real article classifier !'
-    # else:
-    #     return "NOT API"
-    api = False
+
     if not request.json or not 'api' in request.json:
         return render_template('welcome.html')
 
