@@ -41,6 +41,9 @@ model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 @server.route('/predict', methods=['POST'])
 def predict():
+    """
+        Renvoie un texte decrivant le résultat de la prédiction
+    """
     if not request.json:
         title = str(request.form["title"])
         date = str(request.form["date"])
@@ -49,8 +52,10 @@ def predict():
 
 
     else:
-        assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
-        assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
+        assert isinstance(request.json['title'], str), 
+            "The title of the article is not defined or not string"
+        assert isinstance(request.json['text'], str), 
+            "The text of the article is not defined or not string"
 
         title = request.json['title']
         date = request.json['date']
@@ -58,9 +63,7 @@ def predict():
         subject = request.json['subject']
 
     # Create dataframe
-    df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
-
-    data = formate_dataset(df)
+    data = formate_dataset(pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]}))
 
     # Apply function for NLP processing
     data['text'] = data['text'].apply(denoise_text)
@@ -74,8 +77,7 @@ def predict():
     prediction = model.predict_classes(sample_np)[0][0]
     if not request.json:
         return render_template('predict.html', prediction=prediction, title=title)
-    else:
-        return jsonify(message(int(prediction)))
+    return jsonify(message(int(prediction)))
 
 
 @server.route('/hello')
@@ -85,8 +87,7 @@ def say_hello():
     """
     if not request.json or not 'api' in request.json:
         return render_template('welcome.html')
-    else:
-        return 'Welcome to the real article classifier !'
+    return 'Welcome to the real article classifier !'
 
 
 def message(prediction):
