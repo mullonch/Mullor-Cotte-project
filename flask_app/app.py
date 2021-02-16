@@ -3,7 +3,6 @@
     Application hébergeant l'API développée dans le cadre du projet sopra Valdom 2021
 """
 
-
 import pickle
 import re
 import string
@@ -17,7 +16,6 @@ from nltk.corpus import stopwords
 import nltk
 import pandas as pd
 import numpy as np
-
 
 server = Flask(__name__)
 
@@ -50,7 +48,7 @@ def predict():
 
     else:
         assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
-        assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
+        assert isinstance(request.json['text'], str), "The text ogit add .f the article is not defined or not string"
 
         title = request.json['title']
         date = request.json['date']
@@ -81,7 +79,7 @@ def predict():
 @server.route('/hello')
 def say_hello():
     """
-        Fonction de test, dit bonjour à l'utilisateur / page d'accueil
+    Fonction de test, dit bonjour à l'utilisateur / page d'accueil
     """
     if not request.json or not 'api' in request.json:
         return render_template('welcome.html')
@@ -96,9 +94,10 @@ def message(prediction):
     :return: Texte decrivant le résultat de la prédiction
     """
     assert prediction in (0, 1), "The model encountered an issue"
-    if prediction:
+    if prediction == 1:
         return "This is a real news article"
-    return "This is a fake"
+    else:
+        return "This is a fake"
 
 
 def tokenize(text):
