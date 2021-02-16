@@ -6,8 +6,14 @@ from flask import json
 
 
 def test_say_hello():
-    response = server.test_client().get('/hello')
-
+    response = server.test_client().get(
+        '/hello',
+        data=json.dumps({
+            "api": "True"
+        }),
+        content_type='application/json',
+    )
+    # data = json.loads(response.get_data(as_text=True))
     assert response.status_code == 200
     assert response.data == b'Welcome to the real article classifier !'
 
