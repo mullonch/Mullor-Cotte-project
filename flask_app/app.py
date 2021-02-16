@@ -1,28 +1,27 @@
+"""
+    module : app
+    Application hébergeant l'API développée dans le cadre du projet transverse Valdom 2020/21
 
+"""
 import pickle
 import re
 import string
-
 import flask
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
 
 from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
-
 from flask_swagger_ui import get_swaggerui_blueprint
-
 
 # import pickle
 from keras.models import load_model
-from keras.preprocessing import sequence
-from nltk.corpus import stopwords
-import nltk
-import pandas as pd
 from keras.preprocessing import text, sequence
 from keras.preprocessing.text import Tokenizer
-import numpy as np
-import os
+
+import nltk
+from nltk.corpus import stopwords
+x
 
 
 server = Flask(__name__)
@@ -43,21 +42,20 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 server.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 
-
-# Load the model file
-model = load_model('Model/model.h5')
-
-
 @server.route('/predict', methods=['POST'])
 def predict():
-
+    """
+    Effectue une prédiction à partir des données contenues dans le JSON recu
+    Renvoie une chaine de charactères décrivant le résultat de la prédiction.
+    """
     title = request.json['title']
     date = request.json['date']
-    text = request.json['text']
+    texte = request.json['text']
     subject = request.json['subject']
     #return "OK !"
     # Create dataframe
-    df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
+    df = pd.DataFrame(
+        data={"title": [title], "date": [date], "text": [texte], "subject": [subject]})
 
     data = formate_dataset(df)
 
@@ -79,6 +77,9 @@ def predict():
 
 @server.route('/hello')
 def say_hello():
+    """
+    test de l'API, dit bonjour à l'utilisateur
+    """
     return 'Welcome to the real article classifier !'
 
 
@@ -96,13 +97,18 @@ def say_hello():
 
 
 def message(prediction):
+    """
+    Retourne une phrase decrivant le résultat d'une prédiction
+    """
     if prediction:
         return "This is a real news article"
     return "This is a fake"
 
 
 def tokenize(text):
-    # loading
+    """
+    Tokenization du texte
+    """
     with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
         tokenizer = pickle.load(handle)
 
@@ -111,22 +117,34 @@ def tokenize(text):
 
 
 def strip_html(text):
+    """
+    Supprime les balises HTML
+    """
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
 
 # Removing the square brackets
 def remove_between_square_brackets(text):
+    """
+    Supprime tout le contenu se trouvant entre crochets
+    """
     return re.sub('\[[^]]*\]', '', text)
 
 
 # Removing URL's
 def remove_between_square_brackets(text):
+    """
+    Supprime les URL
+    """
     return re.sub(r'http\S+', '', text)
 
 
 # Removing the stopwords from text
 def remove_stopwords(text):
+    """
+    Supprime les mots inutiles (stopwords)
+    """
     nltk.download("stopwords")
     stop = set(stopwords.words('english'))
     punctuation = list(string.punctuation)
@@ -140,6 +158,9 @@ def remove_stopwords(text):
 
 # Removing the noisy text
 def denoise_text(text):
+    """
+    Applique toutes les transformations de nettoyage au texte
+    """
     text = strip_html(text)
     text = remove_between_square_brackets(text)
     text = remove_stopwords(text)
@@ -147,15 +168,20 @@ def denoise_text(text):
 
 
 def formate_dataset(df):
+    """
+    Formate de dataset
+    """
     df['text'] = df['text'] + " " + df['title']
     del df['title']
     del df['subject']
     del df['date']
-
     return df
 
 
 def run_request():
+    """
+    ?
+    """
     index = int(request.json['index'])
     list_color = ['red', 'green', 'blue', 'yellow', 'black']
     return list_color[index]
