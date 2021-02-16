@@ -7,6 +7,7 @@ import pickle
 import re
 import string
 import os
+import json
 from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify, render_template
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -37,7 +38,7 @@ FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 
-@server.route('/predict', methods=['POST'])
+@server.route('/api/predict', methods=['POST'])
 def predict():
     """
         Renvoie un texte decrivant le résultat de la prédiction
@@ -76,15 +77,26 @@ def predict():
     return jsonify(message(int(prediction)))
 
 
-@server.route('/hello')
-def say_hello():
-    """
-    Fonction de test, dit bonjour à l'utilisateur / page d'accueil
-    """
-    if not request.json or not 'api' in request.json:
-        return render_template('welcome.html')
-    return 'Welcome to the real article classifier !'
 
+
+@server.route('/api/hello')
+def api_hello():
+    """
+    Fonction de test, dit bonjour à l'utilisateur
+    """
+    return 'Welcome to the real article classifier API !'
+
+
+@server.route('/api')
+def test_api():
+    return json.dump({"API status":"running"})
+
+@server.route("/", methods=['GET'])
+def home():
+    """
+    :return: page d'accueil de l'application
+    """
+    return render_template('home.html')
 
 def message(prediction):
     """
