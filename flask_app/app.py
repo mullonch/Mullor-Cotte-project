@@ -2,7 +2,7 @@ import pickle
 import re
 import string
 from bs4 import BeautifulSoup
-from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
+from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint, render_template
 from flask_swagger_ui import get_swaggerui_blueprint
 from keras.models import load_model
 from nltk.corpus import stopwords
@@ -63,7 +63,28 @@ def predict():
 
 @server.route('/hello')
 def say_hello():
-    return 'Welcome to the real article classifier !'
+    # if request.headers['Content-Type'] == 'application/json; charset=UTF-8':
+    #     return 'Welcome to the real article classifier !'
+    # else:
+    #     return "NOT API"
+    html = False
+    if not request.json or not 'html' in request.json:
+        html=False
+        return 'Welcome to the real article classifier !'
+    elif request.json['html'] == "True":
+        html = True
+        return render_template('welcome.html')
+
+    # return 'Welcome to the real article classifier !' + str(html)
+
+    # if request.args['type'] == 'json':
+    #     return 'Welcome to the real article classifier !'
+    # else:
+    #     return "<html>\
+    #           <body>\
+    #             <strong>Welcome to the real article classifier !</strong>\
+    #           </body>\
+    #         </html>"
 
 
 # predict with train data prepared retrieved in the notebook
