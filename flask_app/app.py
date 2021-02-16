@@ -3,7 +3,6 @@
     Application hébergeant l'API développée dans le cadre du projet sopra Valdom 2021
 """
 
-
 import pickle
 import re
 import string
@@ -17,7 +16,6 @@ from nltk.corpus import stopwords
 import nltk
 import pandas as pd
 import numpy as np
-
 
 server = Flask(__name__)
 
@@ -42,22 +40,26 @@ model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 @server.route('/predict', methods=['POST'])
 def predict():
     """
-        Effectue une prédiction sur les données transmises par la requete POST
+        Renvoie un texte decrivant le résultat de la prédiction
     """
-    assert isinstance(
-        request.json['title'], str), "The title of the article is not defined or not string"
-    assert isinstance(
-        request.json['text'], str), "The text of the article is not defined or not string"
+    if not request.json:
+        title = str(request.form["title"])
+        date = str(request.form["date"])
+        text = str(request.form["text"])
+        subject = str(request.form["subject"])
 
-    title = request.json['title']
-    date = request.json['date']
-    text = request.json['text']
-    subject = request.json['subject']
+
+    else:
+        assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
+        assert isinstance(request.json['text'], str), "The text ogit add .f the article is not defined or not string"
+
+        title = request.json['title']
+        date = request.json['date']
+        text = request.json['text']
+        subject = request.json['subject']
 
     # Create dataframe
-    df = pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]})
-
-    data = formate_dataset(df)
+    data = formate_dataset(pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]}))
 
     # Apply function for NLP processing
     data['text'] = data['text'].apply(denoise_text)
@@ -69,47 +71,19 @@ def predict():
     sample_np = np.array(tokenized_text).reshape(-1, 300)
 
     prediction = model.predict_classes(sample_np)[0][0]
-
+    if not request.json:
+        return render_template('predict.html', prediction=prediction, title=title)
     return jsonify(message(int(prediction)))
 
 
 @server.route('/hello')
 def say_hello():
     """
-        Fonction de test, dit bonjour à l'utilisateur
+    Fonction de test, dit bonjour à l'utilisateur / page d'accueil
     """
-
-    # html = False
-    if not request.json or not 'html' in request.json:
-        # html=False
-        return 'Welcome to the real article classifier !'
-    elif request.json['html'] == "True":
-        # html = True
+    if not request.json or not 'api' in request.json:
         return render_template('welcome.html')
-
-    # return 'Welcome to the real article classifier !' + str(html)
-
-    # if request.args['type'] == 'json':
-    #     return 'Welcome to the real article classifier !'
-    # else:
-    #     return "<html>\
-    #           <body>\
-    #             <strong>Welcome to the real article classifier !</strong>\
-    #           </body>\
-    #         </html>"
-
-
-# predict with train data prepared retrieved in the notebook
-# @server.route('/predict_with_data')
-# def predict_with_data():
-#    print("ok")
-#    data_train = pd.read_csv('Model/train_data.csv')
-#    for i in range(10):
-#        sample = data_train.values.tolist()[i][1:]  # remove index added by pandas
-#        sample_np = np.array(sample)
-#         prediction = model.predict_classes(sample_np.reshape(-1, 300))[0][0]
-#
-#    return jsonify(prediction)
+    return 'Welcome to the real article classifier !'
 
 
 def message(prediction):
@@ -119,9 +93,10 @@ def message(prediction):
     :return: Texte decrivant le résultat de la prédiction
     """
     assert prediction in (0, 1), "The model encountered an issue"
-    if prediction:
+    if prediction == 1:
         return "This is a real news article"
-    return "This is a fake"
+    else:
+        return "This is a fake"
 
 
 def tokenize(text):

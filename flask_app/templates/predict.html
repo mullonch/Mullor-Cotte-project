@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+ <head>
+     <!-- Bootstrap CSS -->
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+   <body>
+
+   <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand" href=hello>Home</a>
+    </nav>
+   <br><br>
+   <center>
+   {% if prediction == 1 %}
+   <h5 style="color:darkgreen">"<strong>{{title }}</strong>" is a real article</h5>
+   {% else %}
+   <h5 style="color:darkred">"<strong>{{title }}</strong>" is a fake</h5>
+    {% endif %}
+   </center>
+</body>
+</html>
