@@ -1,16 +1,23 @@
+"""
+    Module app.py
+    Application hébergeant l'API développée dans le cadre du projet sopra Valdom 2021
+"""
+
+
 import pickle
 import re
 import string
+import os
 from bs4 import BeautifulSoup
-from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint, render_template
+from flask import Flask, request, jsonify, render_template
 from flask_swagger_ui import get_swaggerui_blueprint
 from keras.models import load_model
+from keras.preprocessing import sequence
 from nltk.corpus import stopwords
 import nltk
 import pandas as pd
-from keras.preprocessing import text, sequence
 import numpy as np
-import os
+
 
 server = Flask(__name__)
 
@@ -34,8 +41,13 @@ model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 @server.route('/predict', methods=['POST'])
 def predict():
-    assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
-    assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
+    """
+        Effectue une prédiction sur les données transmises par la requete POST
+    """
+    assert isinstance(
+        request.json['title'], str), "The title of the article is not defined or not string"
+    assert isinstance(
+        request.json['text'], str), "The text of the article is not defined or not string"
 
     title = request.json['title']
     date = request.json['date']
@@ -63,16 +75,16 @@ def predict():
 
 @server.route('/hello')
 def say_hello():
-    # if request.headers['Content-Type'] == 'application/json; charset=UTF-8':
-    #     return 'Welcome to the real article classifier !'
-    # else:
-    #     return "NOT API"
-    html = False
+    """
+        Fonction de test, dit bonjour à l'utilisateur
+    """
+
+    # html = False
     if not request.json or not 'html' in request.json:
-        html=False
+        # html=False
         return 'Welcome to the real article classifier !'
     elif request.json['html'] == "True":
-        html = True
+        # html = True
         return render_template('welcome.html')
 
     # return 'Welcome to the real article classifier !' + str(html)
@@ -101,14 +113,23 @@ def say_hello():
 
 
 def message(prediction):
-    assert (prediction == 0 or prediction == 1), "The model encountered an issue"
-    if prediction == 1:
+    """
+    Retourne une phrase décrivant le résultat d'une prédiction
+    :param prediction: résultat d'une prédiction
+    :return: Texte decrivant le résultat de la prédiction
+    """
+    assert prediction in (0, 1), "The model encountered an issue"
+    if prediction:
         return "This is a real news article"
-    elif prediction == 0:
-        return "This is a fake"
+    return "This is a fake"
 
 
 def tokenize(text):
+    """
+    Tokenize le texte
+    :param text: texte à transformer
+    :return: texte transformé
+    """
     # loading tokenizer file
     # with open('Tokenizer/tokenizer.pickle', 'rb') as handle:
     with open(os.path.join(FILE_DIR, 'Tokenizer', 'tokenizer.pickle'), 'rb') as handle:
@@ -119,22 +140,42 @@ def tokenize(text):
 
 
 def strip_html(text):
+    """
+    Supprime le contenu HTML (balises)
+    :param text: texte à transformer
+    :return: texte transformé
+    """
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
 
 # Removing all between the square brackets
 def remove_between_square_brackets(text):
+    """
+    Supprime tout le contenu se trouvant entre cochets
+    :param text: texte à transformer
+    :return: texte transformé
+    """
     return re.sub('\[[^]]*\]', '', text)
 
 
 # Removing URL's
 def remove_url(text):
+    """
+    Supprime les URLs
+    :param text: texte à transformer
+    :return: texte transformé
+    """
     return re.sub(r'http\S+', '', text)
 
 
 # Removing the stopwords from text
 def remove_stopwords(text):
+    """
+    Supprime les mots inutiles (stopwords)
+    :param text: texte à transformer
+    :return: texte transformé
+    """
     nltk.download("stopwords")
     stop = set(stopwords.words('english'))
     punctuation = list(string.punctuation)
@@ -148,6 +189,11 @@ def remove_stopwords(text):
 
 # Removing the noisy text
 def denoise_text(text):
+    """
+    Applique tous les nettoyages au texte passé en parametre
+    :param text: texte à nettoyer
+    :return: texte nettoyé
+    """
     text = strip_html(text)
     text = remove_between_square_brackets(text)
     text = remove_url(text)
@@ -156,6 +202,11 @@ def denoise_text(text):
 
 
 def formate_dataset(df):
+    """
+    Formate le dataset
+    :param df: dataframe à formater
+    :return: dataframe formaté
+    """
     df['text'] = df['text'] + " " + df['title']
     del df['title']
     del df['subject']
