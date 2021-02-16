@@ -1,2 +1,7 @@
 /venv_sopra
 .idea/
+flask_app/__pycache__/
+__pycache__/
+tests/__pycache__/
+venv
+flask_app/tests/__pycache__/
