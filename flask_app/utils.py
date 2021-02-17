@@ -22,7 +22,7 @@ model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 def prediction(data):
     """
-    Apply function for NLP processing
+    Apply function for NLP processing and prediction
     """
     data['text'] = data['text'].apply(denoise_text)
 
