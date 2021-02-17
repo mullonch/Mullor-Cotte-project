@@ -1,3 +1,8 @@
+"""
+module utils.py
+diverses fonctions utiles
+prétraitement des données
+"""
 import pickle
 import re
 import string
@@ -16,7 +21,9 @@ model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 
 def prediction(data):
-    # Apply function for NLP processing
+    """
+    Apply function for NLP processing
+    """
     data['text'] = data['text'].apply(denoise_text)
 
     # Tokenize sample
@@ -28,17 +35,16 @@ def prediction(data):
     return model.predict_classes(sample_np)[0][0]
 
 
-def message(prediction):
+def message(pred_result):
     """
     Retourne une phrase décrivant le résultat d'une prédiction
     :param prediction: résultat d'une prédiction
     :return: Texte decrivant le résultat de la prédiction
     """
-    assert prediction in (0, 1), "The model encountered an issue"
-    if prediction == 1:
+    assert pred_result in (0, 1), "The model encountered an issue"
+    if pred_result:
         return "This is a real news article"
-    else:
-        return "This is a fake"
+    return "This is a fake"
 
 
 def tokenize(text):
@@ -73,7 +79,7 @@ def remove_between_square_brackets(text):
     :param text: texte à transformer
     :return: texte transformé
     """
-    return re.sub('\[[^]]*\]', '', text)
+    return re.sub('[[][^]]*[]]', '', text)
 
 
 # Removing URL's
@@ -118,14 +124,14 @@ def denoise_text(text):
     return text
 
 
-def formate_dataset(df):
+def formate_dataset(dframe):
     """
     Formate le dataset
-    :param df: dataframe à formater
+    :param dframe: dataframe à formater
     :return: dataframe formaté
     """
-    df['text'] = df['text'] + " " + df['title']
-    del df['title']
-    del df['subject']
-    del df['date']
-    return df
+    dframe['text'] = dframe['text'] + " " + dframe['title']
+    del dframe['title']
+    del dframe['subject']
+    del dframe['date']
+    return dframe
