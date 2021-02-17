@@ -20,5 +20,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint flask_app/utils.py
-        #pylint `ls -R|grep .py$|xargs`
+        pylint `ls -R|grep .py$|xargs`
