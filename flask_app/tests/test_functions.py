@@ -5,10 +5,10 @@ module de tests fonctionnels
 import sys
 import os
 import pandas as pd
-import utils
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+import utils
 
 def test_fake_article_message():
     """
