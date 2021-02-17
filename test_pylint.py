@@ -1,3 +1,7 @@
+"""
+test pylint
+"""
+
 def my_function():
     """
       Fonction de test
