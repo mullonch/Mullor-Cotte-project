@@ -38,8 +38,10 @@ def api_predict():
         Renvoie un texte decrivant le résultat de la prédiction
     """
 
-    assert isinstance(request.json['title'], str), "The title of the article is not defined or not string"
-    assert isinstance(request.json['text'], str), "The text of the article is not defined or not string"
+    assert isinstance(
+        request.json['title'], str), "The title of the article is not defined or not string"
+    assert isinstance(
+        request.json['text'], str), "The text of the article is not defined or not string"
 
     title = request.json['title']
     date = request.json['date']
@@ -47,11 +49,10 @@ def api_predict():
     subject = request.json['subject']
 
     # Create dataframe
-    data = formate_dataset(pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]}))
+    data = formate_dataset(
+        pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]}))
     # Return prediction
-    y = prediction(data)
-
-    return jsonify(message(int(y)))
+    return jsonify(message(int(prediction(data))))
 
 
 @server.route('/api/hello')
@@ -64,6 +65,9 @@ def api_hello():
 
 @server.route('/api')
 def test_api():
+    """
+    return status of the API
+    """
     return jsonify({"API status": "running"})
 
 
@@ -82,8 +86,10 @@ def predict():
     """
         Renvoie un template decrivant le résultat de la prédiction
     """
-    assert isinstance(request.form['title'], str), "The title of the article is not defined or not string"
-    assert isinstance(request.form['text'], str), "The text of the article is not defined or not string"
+    assert isinstance(
+        request.form['title'], str), "The title of the article is not defined or not string"
+    assert isinstance(
+        request.form['text'], str), "The text of the article is not defined or not string"
 
     title = str(request.form["title"])
     date = str(request.form["date"])
@@ -91,8 +97,7 @@ def predict():
     subject = str(request.form["subject"])
 
     # Create dataframe
-    data = formate_dataset(pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]}))
+    data = formate_dataset(
+        pd.DataFrame(data={"title": [title], "date": [date], "text": [text], "subject": [subject]}))
     # Return prediction
-    y = prediction(data)
-
-    return render_template('result.html', prediction=y, title=title)
+    return render_template('result.html', prediction=prediction(data), title=title)
