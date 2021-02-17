@@ -21,3 +21,4 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint test_pylint.py
+        pylint flask_app/app.py
