@@ -5,9 +5,9 @@ module de tests fonctionnels
 import sys
 import os
 import pandas as pd
+import utils
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import utils
 
 
 def test_fake_article_message():
@@ -42,7 +42,7 @@ def test_strip_html():
     """
     test suppression des balises HTML
     """
-    assert utils.strip_html("<div><br>Hello</div>") == "Hello" 
+    assert utils.strip_html("<div><br>Hello</div>") == "Hello"
 
 
 def test_tokenize():
@@ -64,7 +64,7 @@ def test_tokenize():
          0, 0, 539, 475, 785, 1642, 183, 4247, 475, 4080]]
 
     comparison = array == utils.tokenize(text)
-    assert comparison.all() == True
+    assert comparison.all()
 
 
 def test_remove_stopwords():
@@ -86,14 +86,16 @@ def test_formate_dataset():
     df_returned = pd.DataFrame(
         data={"title": ["1st title", "2nd title"],
               "text": ["1st text 1st title", "2nd text 2nd title"]})
-    assert df_returned.sort_index(inplace=True) == utils.formate_dataset(df_test).sort_index(inplace=True)
+    assert df_returned.sort_index(inplace=True) == 
+        utils.formate_dataset(df_test).sort_index(inplace=True)
 
 
 def test_denoise_text():
     """
     test suppression du bruit dans le texte
     """
-    assert utils.denoise_text("<div><br>is there fake news on this site https://www.bfmtv.com?</div>") == "fake news site"
+    assert utils.denoise_text(
+        "<div><br>is there fake news on this site https://www.bfmtv.com?</div>") == "fake news site"
 
 def test_prediction():
     """
