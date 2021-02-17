@@ -2,21 +2,16 @@ import pickle
 import re
 import string
 import os
-import json
 from bs4 import BeautifulSoup
-from flask import Flask, request, jsonify, render_template
-from flask_swagger_ui import get_swaggerui_blueprint
 from keras.models import load_model
 from keras.preprocessing import sequence
 from nltk.corpus import stopwords
 import nltk
-import pandas as pd
 import numpy as np
 
 # absolute path to this file
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 # load model
-# model = load_model('Model/model.h5')
 model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
 

@@ -3,20 +3,11 @@
     Application hébergeant l'API développée dans le cadre du projet sopra Valdom 2021
 """
 
-import pickle
-import re
-import string
 import os
-import json
-from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify, render_template
 from flask_swagger_ui import get_swaggerui_blueprint
 from keras.models import load_model
-from keras.preprocessing import sequence
-from nltk.corpus import stopwords
-import nltk
 import pandas as pd
-import numpy as np
 from utils import formate_dataset, prediction, message
 
 server = Flask(__name__)
@@ -38,6 +29,8 @@ FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 # model = load_model('Model/model.h5')
 model = load_model(os.path.join(FILE_DIR, 'Model', 'model.h5'))
 
+
+##################################### API ##########################################
 
 @server.route('/api/predict', methods=['POST'])
 def api_predict():
@@ -61,6 +54,29 @@ def api_predict():
     return jsonify(message(int(y)))
 
 
+@server.route('/api/hello')
+def api_hello():
+    """
+    Fonction de test, dit bonjour à l'utilisateur
+    """
+    return 'Welcome to the real article classifier API !'
+
+
+@server.route('/api')
+def test_api():
+    return jsonify({"API status": "running"})
+
+
+##################################### Inerface web ##########################################
+
+@server.route("/", methods=['GET'])
+def home():
+    """
+    :return: page d'accueil de l'application
+    """
+    return render_template('home.html')
+
+
 @server.route('/predict', methods=['POST'])
 def predict():
     """
@@ -80,27 +96,3 @@ def predict():
     y = prediction(data)
 
     return render_template('result.html', prediction=y, title=title)
-
-
-@server.route('/api/hello')
-def api_hello():
-    """
-    Fonction de test, dit bonjour à l'utilisateur
-    """
-    return 'Welcome to the real article classifier API !'
-
-
-@server.route('/api')
-def test_api():
-    return jsonify({"API status": "running"})
-
-
-@server.route("/", methods=['GET'])
-def home():
-    """
-    :return: page d'accueil de l'application
-    """
-    return render_template('home.html')
-
-
-

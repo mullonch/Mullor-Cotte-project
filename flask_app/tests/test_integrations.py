@@ -1,21 +1,22 @@
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import server
 from flask import json
 
 
 def test_say_hello():
-    response = server.test_client().get(
-        '/api/hello',
-        data=json.dumps({
-            "api": "True"
-        }),
-        content_type='application/json',
-    )
-    # data = json.loads(response.get_data(as_text=True))
+    response = server.test_client().get('/api/hello')
     assert response.status_code == 200
     assert response.data == b'Welcome to the real article classifier API !'
+
+
+def test_run_api():
+    response = server.test_client().get('/api')
+    # data = json.loads(response.get_data(as_text=True))
+    assert response.status_code == 200
+    assert response.data == b'{"API status":"running"}\n'
 
 
 def test_predict_fake_news():
@@ -113,5 +114,3 @@ def test_predict_real_news():
     data = json.loads(response.get_data(as_text=True))
     assert response.status_code == 200
     assert response.data == b'"This is a real news article"\n'
-
-

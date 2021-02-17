@@ -1,10 +1,8 @@
-import pytest
 import sys
 import os
 import pandas as pd
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import app
 import utils
 
 
@@ -60,3 +58,10 @@ def test_formate_dataset():
 
 def test_denoise_text():
     assert "fake news site" == utils.denoise_text("<div><br>is there fake news on this site https://www.bfmtv.com?</div>")
+
+
+def test_prediction():
+    df = pd.DataFrame(
+        data={"title": ["1st title"], "date": ["1st date"], "text": ["1st text"],
+              "subject": ["1st subject"]})
+    assert 0 == utils.prediction(df) or 1 == utils.prediction(df)
