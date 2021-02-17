@@ -86,8 +86,9 @@ def test_formate_dataset():
     df_returned = pd.DataFrame(
         data={"title": ["1st title", "2nd title"],
               "text": ["1st text 1st title", "2nd text 2nd title"]})
-    assert df_returned.sort_index(inplace=True) == 
-        utils.formate_dataset(df_test).sort_index(inplace=True)
+    assert df_returned.sort_index(
+        inplace=True) == utils.formate_dataset(
+        df_test).sort_index(inplace=True)
 
 
 def test_denoise_text():
