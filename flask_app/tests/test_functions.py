@@ -79,10 +79,13 @@ def test_formate_dataset():
     test formatage dataset
     """
     df_test = pd.DataFrame(
-        data={"title": ["1st title", "2nd title"], "date": ["1st date", "2nd date"], "text": ["1st text", "2nd text"],
+        data={"title": ["1st title", "2nd title"],
+              "date": ["1st date", "2nd date"],
+              "text": ["1st text", "2nd text"],
               "subject": ["1st subject", "2nd subject"]})
     df_returned = pd.DataFrame(
-        data={"title": ["1st title", "2nd title"], "text": ["1st text 1st title", "2nd text 2nd title"]})
+        data={"title": ["1st title", "2nd title"],
+              "text": ["1st text 1st title", "2nd text 2nd title"]})
     assert df_returned.sort_index(inplace=True) == utils.formate_dataset(df_test).sort_index(inplace=True)
 
 
@@ -90,14 +93,16 @@ def test_denoise_text():
     """
     test suppression du bruit dans le texte
     """
-    assert utils.denoise_text("<div><br>is there fake news on this site https://www.bfmtv.com?</div>") == "fake news site" 
-
+    assert utils.denoise_text("<div><br>is there fake news on this site https://www.bfmtv.com?</div>") == "fake news site"
 
 def test_prediction():
     """
-    test prédiction
+    test prediction
     """
-    df = pd.DataFrame(
-        data={"title": ["1st title"], "date": ["1st date"], "text": ["1st text"],
+    dataf = pd.DataFrame(
+        data={"title": ["1st title"],
+              "date": ["1st date"],
+              "text": ["1st text"],
               "subject": ["1st subject"]})
-    assert 0 == utils.prediction(df) or 1 == utils.prediction(df)
+    assert utils.prediction(dataf) in (0, 1)
+   
