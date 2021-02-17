@@ -7,7 +7,7 @@ from flask import json
 
 def test_say_hello():
     response = server.test_client().get(
-        '/hello',
+        '/api/hello',
         data=json.dumps({
             "api": "True"
         }),
@@ -15,12 +15,12 @@ def test_say_hello():
     )
     # data = json.loads(response.get_data(as_text=True))
     assert response.status_code == 200
-    assert response.data == b'Welcome to the real article classifier !'
+    assert response.data == b'Welcome to the real article classifier API !'
 
 
 def test_predict_fake_news():
     response = server.test_client().post(
-        '/predict',
+        '/api/predict',
         data=json.dumps({
             "title": "Tone Deaf Trump: Congrats Rep. Scalise On Losing Weight After You Almost Died",
             "date": "January 14, 2016",
@@ -56,7 +56,7 @@ def test_predict_fake_news():
 
 def test_predict_real_news():
     response = server.test_client().post(
-        '/predict',
+        '/api/predict',
         data=json.dumps({
             "title": "As U.S. budget fight looms, Republicans flip their fiscal script",
             "date": "December 31, 2017",
